@@ -76,6 +76,7 @@ router.put("/:id", checkAuth, async (req, res, next) => {
   }
 });
 
+//Delete blog by ID
 router.delete("/:id", checkAuth, async (req, res, next) => {
   try {
     const delBlog = await Blog.destroy({
