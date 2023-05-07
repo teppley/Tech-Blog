@@ -1,88 +1,97 @@
-// Import necessary packages
 const express = require("express");
 const router = express.Router();
 const { User, Blog, Comment } = require("../../models");
+const withAuth = require('../../util/auth.js');
 
-const withAuth = (req, res, next) => {
+// Middleware to check for logged in user
+const checkAuth = (req, res, next) => {
   if (!req.session.user) {
-    return res.status(401).json({ msg: "Please login first!" })
+    return res.status(401).json({ msg: "Please login!" });
   }
   next();
 };
 
-// Handler listens for GET requests to the root URL path and returns all comments in the database
-router.get("/", async (req, res) => {
+// Get all blogs and associated users/comments
+router.get("/", async (req, res, next) => {
   try {
-    const comments = await Comment.findAll({ include: [User, Blog] });
-    res.json(comments);
+    const blogs = await Blog.findAll({ include: [User, Comment] });
+    res.json(blogs);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ msg: "an error occured", err });
+    next(err);
   }
 });
 
-// Handler listens for GET requests to a URL path that includes a comment ID parameter
-router.get("/:id", async (req, res) => {
+// Get one blog with associated user and comment
+router.get("/:id", async (req, res, next) => {
   try {
-    const comment = await Comment.findByPk(req.params.id, { include: [User, Blog] });
-    if (!comment) {
-      return res.status(404).json({ msg: "Comment not found" });
-    }
-    res.json(comment);
+    const blog = await Blog.findByPk(req.params.id, { include: [User, Comment] });
+    res.json(blog);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ msg: "an error occured", err });
+    next(err);
   }
 });
 
-// Handler listens for POST requests to the root URL path and creates a new comment in the database
-router.post("/", withAuth, async (req, res) => {
+// Create new blog post
+router.post("/", checkAuth, async (req, res, next) => {
   try {
-    const { body, blogId } = req.body;
-    const userId = req.session.user.id;
-    if (!body || !blogId) {
-      return res.status(400).json({ msg: "Please provide body and blogId" });
+    // Validate input data
+    if (!req.body.title || !req.body.content) {
+      return res.status(400).json({ msg: "Title and content are required" });
     }
-    const newComment = await Comment.create({ body, userId, blogId });
-    res.json(newComment);
+
+    const newBlog = await Blog.create({
+      title: req.body.title,
+      content: req.body.content,
+      userId: req.session.user.id,
+    });
+
+    res.json(newBlog);
   } catch (err) {
-    console.log(err);
-    if (err.name === "SequelizeValidationError") {
-      return res.status(400).json({ msg: err.errors[0].message });
-    }
-    res.status(500).json({ msg: "an error occured", err });
+    next(err);
   }
 });
 
-// Handler listens for PUT requests for updating a specific comment with the given ID
-router.put("/:id", withAuth, async (req, res) => {
+// Update post - with Auth
+router.put("/:id", checkAuth, async (req, res, next) => {
   try {
-    const comment = await Comment.findByPk(req.params.id);
-    if (!comment) {
-      return res.status(404).json({ msg: "Comment not found" });
+    // Validate input data
+    if (!req.body.title || !req.body.content) {
+      return res.status(400).json({ msg: "Title and content are required" });
     }
-    await comment.update(req.body);
-    res.json(comment);
+
+    const updatedBlog = await Blog.update(req.body, {
+      where: {
+        id: req.params.id,
+        userId: req.session.user.id,
+      },
+    });
+
+    if (updatedBlog[0] === 0) {
+      return res.status(403).json({ msg: "Unauthorized" });
+    }
+
+    res.json(updatedBlog);
   } catch (err) {
-    console.log(err);
-    if (err.name === "SequelizeValidationError") {
-      return res.status(400).json({ msg: err.errors[0].message });
-    }
-    res.status(500).json({ msg: "an error occured", err });
+    next(err);
   }
 });
-// Deletes a specific comment from the database using the comment ID.
-router.delete("/:id", withAuth, async (req, res) => {
+
+router.delete("/:id", checkAuth, async (req, res, next) => {
   try {
-    const comment = await Comment.findByPk(req.params.id);
-    if (!comment) {
-      return res.status(404).json({ msg: "Comment not found" });
+    const delBlog = await Blog.destroy({
+      where: {
+        id: req.params.id,
+        userId: req.session.user.id,
+      },
+    });
+
+    if (delBlog === 0) {
+      return res.status(403).json({ msg: "Unauthorized" });
     }
-    await comment.destroy();
-    res.json(comment);
+
+    res.json(delBlog);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ msg: "an error occured", err });
+    next(err);
   }
 });
 
