@@ -1,8 +1,10 @@
+//Import necessary modules and models.
 const express = require("express");
 const router = express.Router();
 const {User, Blog, Comment} = require("../../models/");
 const bcrypt  = require("bcrypt");
 
+//Route to get all users and their associated blogs and comments from the database.
 router.get("/", (req, res) => {
     User.findAll({
       include:[Blog, Comment]
@@ -16,12 +18,13 @@ router.get("/", (req, res) => {
       });
   });
 
-  // logout by hitting /api/users/logout
+  // Route to log out the current user by destroying their session and redirecting them to the home page.
 router.get("/logout",(req,res)=>{
     req.session.destroy();
     res.redirect('/');
 })
 
+//Route to get a specific user and their associated blogs and comments from the database by their ID.
 router.get("/:id", (req, res) => {
     User.findByPk(req.params.id,{include:[Blog, Comment]})
       .then(dbUser => {
@@ -33,12 +36,11 @@ router.get("/:id", (req, res) => {
       });
 });
 
-// sign up api/users/
+// Route to create a new user in the database and create a session for them.
 router.post("/", (req, res) => {
   // run hooks to hash and salt password; create user
     User.create(req.body, {individualHooks: true} )
       .then(newUser => {
-        // IMMEDIATE LOG IN = create new session for user with id and username (sessions set to 30 min)
         req.session.user = {
           id:newUser.id,
           username:newUser.username
@@ -51,7 +53,7 @@ router.post("/", (req, res) => {
       });
 });
 
-// login api/users/login
+// Route to authenticate a user and create a session for them if they are authenticated.
 router.post("/login", (req, res) => {
   // find username name that matches request
     User.findOne({
@@ -71,7 +73,7 @@ router.post("/login", (req, res) => {
           username:foundUser.username
         }
         return res.json(foundUser)
-        // redirect page??
+        // redirect page
       } else {
         return res.status(400).json({msg:"wrong login credentials"})
       }
@@ -81,6 +83,7 @@ router.post("/login", (req, res) => {
       });
 });
   
+// Route to update a user's information in the database.
 router.put("/:id", (req, res) => {
     User.update(req.body, {
       where: {
@@ -96,6 +99,7 @@ router.put("/:id", (req, res) => {
     });
 });
   
+//Route to delete a user from the database.
 router.delete("/:id", (req, res) => {
     User.destroy({
       where: {

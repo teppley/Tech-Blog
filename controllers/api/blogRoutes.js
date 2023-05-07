@@ -1,9 +1,10 @@
+// Import necessary modules and models
 const express = require("express");
 const router = express.Router();
 const {User, Blog, Comment} = require("../../models");
 const withAuth = require('../../util/auth.js')
 
-// get all blogs and associated users/comments
+// Get all blogs and associated users and comments
 router.get("/", (req, res) => {
     Blog.findAll({include:[User, Comment]})
       .then(dbBlogs => {
@@ -15,7 +16,7 @@ router.get("/", (req, res) => {
       });
   });
 
-  // get one blog with associated user and comment
+  // Get one blog with associated user and comment
 router.get("/:id", (req, res) => {
     Blog.findByPk(req.params.id,{include:[User, Comment]})
       .then(dbBlog => {
@@ -27,7 +28,7 @@ router.get("/:id", (req, res) => {
       });
 });
 
-// create new blog post
+// Create new blog post
 router.post("/", (req, res) => {
   // check for logged in user
   // if no user in session, send messsage
@@ -50,7 +51,7 @@ router.post("/", (req, res) => {
       });
 });
 
-// update post - withAuth fx 
+// Update blog post 
 router.put("/:id", (req, res) => {
   if(!req.session.user){
     return res.status(401).json({msg:"Please login!"})
@@ -68,6 +69,7 @@ router.put("/:id", (req, res) => {
     });
 });
 
+//Delete blog post
 router.delete("/:id", (req, res) => {
   if(!req.session.user){
     return res.status(401).json({msg:"Please login!"})

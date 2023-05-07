@@ -6,29 +6,30 @@
 
 body {
   height: 100vh;
-  background-color: azure;
+  background-color: #defae3
 }
 
 header, h1 {
-  background-color: #355C7D;
-  padding: 10px;
-  color: white !important;
+  background-color: #17050c;
+  padding: 20px;
+  color: #defae3 !important;
 }
 
 header a {
   margin: 10px;
-  padding: 5px;
-  color: white !important;
+  padding: 10px;
+  color: #defae3 !important;
+  font-size: larger;
 }
 
 .card-title {
-  background-color: #355C7D;
-  color: white;
+  background-color: #17050c;
+  color: #defae3;
   padding: 5px;
 }
 
 .card {
-  background-color: azure;
+  background-color: #defae3
 }
 
 .card h5, .card p {
@@ -39,6 +40,10 @@ header a {
 button {
   padding: 3px;
   margin: 5px;
+  border-radius: 12px;
+  background-color: #17050c;
+  color: #defae3;
+  
 }
 
 #newpost {
