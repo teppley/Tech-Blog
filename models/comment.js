@@ -1,6 +1,8 @@
+//Import model and datatypes from sequelize package
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
 
+// Declares a new comment class
 class Comment extends Model {}
 
 Comment.init({

@@ -19,4 +19,4 @@ Blog.init({
     modelName: 'blog',
 });
 
-module.exports=Blog
+module.exports=Blog;
