@@ -1,99 +1,88 @@
 const express = require("express");
 const router = express.Router();
-const { User, Blog, Comment } = require("../../models");
-const withAuth = require('../../util/auth.js');
+const {User, Blog, Comment} = require("../../models");
+const withAuth = require('../../util/auth.js')
 
-// Middleware to check for logged in user
-const checkAuth = (req, res, next) => {
-  if (!req.session.user) {
-    return res.status(401).json({ msg: "Please login!" });
-  }
-  next();
-};
+// get all blogs and associated users/comments
+router.get("/", (req, res) => {
+    Blog.findAll({include:[User, Comment]})
+      .then(dbBlogs => {
+        res.json(dbBlogs);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ msg: "an error occured", err });
+      });
+  });
 
-// Get all blogs and associated users/comments
-router.get("/", async (req, res, next) => {
-  try {
-    const blogs = await Blog.findAll({ include: [User, Comment] });
-    res.json(blogs);
-  } catch (err) {
-    next(err);
-  }
+  // get one blog with associated user and comment
+router.get("/:id", (req, res) => {
+    Blog.findByPk(req.params.id,{include:[User, Comment]})
+      .then(dbBlog => {
+        res.json(dbBlog);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ msg: "an error occured", err });
+      });
 });
 
-// Get one blog with associated user and comment
-router.get("/:id", async (req, res, next) => {
-  try {
-    const blog = await Blog.findByPk(req.params.id, { include: [User, Comment] });
-    res.json(blog);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// Create new blog post
-router.post("/", checkAuth, async (req, res, next) => {
-  try {
-    // Validate input data
-    if (!req.body.title || !req.body.content) {
-      return res.status(400).json({ msg: "Title and content are required" });
+// create new blog post
+router.post("/", (req, res) => {
+  // check for logged in user
+  // if no user in session, send messsage
+    if(!req.session.user){
+      return res.status(401).json({msg:"Please login!"})
     }
-
-    const newBlog = await Blog.create({
-      title: req.body.title,
-      content: req.body.content,
-      userId: req.session.user.id,
-    });
-
-    res.json(newBlog);
-  } catch (err) {
-    next(err);
-  }
+    // create blog post with title and content input by user; user id from session data
+    Blog.create({
+      title:req.body.title,
+      content:req.body.content,
+      userId:req.session.user.id
+    })
+    // date is "createdAt"
+      .then(newBlog => {
+        res.json(newBlog);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ msg: "an error occured", err });
+      });
 });
 
-// Update post - with Auth
-router.put("/:id", checkAuth, async (req, res, next) => {
-  try {
-    // Validate input data
-    if (!req.body.title || !req.body.content) {
-      return res.status(400).json({ msg: "Title and content are required" });
-    }
-
-    const updatedBlog = await Blog.update(req.body, {
+// update post - withAuth fx 
+router.put("/:id", (req, res) => {
+  if(!req.session.user){
+    return res.status(401).json({msg:"Please login!"})
+  }
+  Blog.update(req.body, {
       where: {
-        id: req.params.id,
-        userId: req.session.user.id,
-      },
+        id: req.params.id
+      }
+    }).then(updatedBlog => {
+      res.json(updatedBlog);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ msg: "an error occured", err });
     });
-
-    if (updatedBlog[0] === 0) {
-      return res.status(403).json({ msg: "Unauthorized" });
-    }
-
-    res.json(updatedBlog);
-  } catch (err) {
-    next(err);
-  }
 });
 
-//Delete blog by ID
-router.delete("/:id", checkAuth, async (req, res, next) => {
-  try {
-    const delBlog = await Blog.destroy({
+router.delete("/:id", (req, res) => {
+  if(!req.session.user){
+    return res.status(401).json({msg:"Please login!"})
+  }
+    Blog.destroy({
       where: {
-        id: req.params.id,
-        userId: req.session.user.id,
-      },
+        id: req.params.id
+      }
+    }).then(delBlog => {
+      res.json(delBlog);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ msg: "an error occured", err });
     });
-
-    if (delBlog === 0) {
-      return res.status(403).json({ msg: "Unauthorized" });
-    }
-
-    res.json(delBlog);
-  } catch (err) {
-    next(err);
-  }
 });
-
+  
 module.exports = router;

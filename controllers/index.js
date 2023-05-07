@@ -2,19 +2,19 @@ const express = require('express');
 const router = express.Router();
 
 const userRoutes = require("./api/userRoutes.js");
+router.use("/api/users",userRoutes)
+
 const blogRoutes = require("./api/blogRoutes");
+router.use("/api/blogs",blogRoutes)
+
 const commentRoutes = require("./api/commentRoutes");
-const frontEndRoutes = require("./frontendRoutes");
+router.use("/api/comments",commentRoutes)
 
-router.use("/api/users", userRoutes);
-router.use("/api/blogs", blogRoutes);
-router.use("/api/comments", commentRoutes);
-router.use("/", frontEndRoutes);
+const frontEnd = require("./frontendRoutes");
+router.use("/",frontEnd)
 
-// Catch-all error handler
-router.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: "Internal Server Error" });
-});
+router.get("/showsessions",(req,res)=>{
+    res.json(req.session)
+})
 
 module.exports = router;

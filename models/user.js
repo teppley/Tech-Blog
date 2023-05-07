@@ -4,8 +4,8 @@ const bcrypt = require("bcrypt")
 
 class User extends Model {}
 
-User.init(
-  {
+User.init({
+    // add properites here, ex:
     username: {
          type: DataTypes.STRING,
          allowNull:false,
@@ -18,8 +18,7 @@ User.init(
             len:[8]
         }
     }
-},
-{
+},{
     hooks:{
         beforeCreate:async userdata=>{
             userdata.password = await bcrypt.hash(userdata.password,5)

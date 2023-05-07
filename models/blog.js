@@ -3,8 +3,7 @@ const sequelize = require('../config/connection');
 
 class Blog extends Model {}
 
-Blog.init(
-  {
+Blog.init({
     title: {
          type: DataTypes.STRING,
          allowNull:false
@@ -13,8 +12,7 @@ Blog.init(
         type:DataTypes.TEXT,
         allowNull:false
     }
-},
-{
+},{
     sequelize,   
     freezeTableName: true,
     underscored: true,

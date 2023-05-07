@@ -3,8 +3,7 @@ const sequelize = require('../config/connection');
 
 class Comment extends Model {}
 
-Comment.init(
-  {
+Comment.init({
     body: {
         type:DataTypes.TEXT,
         allowNull:false
@@ -13,8 +12,7 @@ Comment.init(
         type:DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     }
-},
-{
+},{
     sequelize,   
     freezeTableName: true,
     underscored: true,
