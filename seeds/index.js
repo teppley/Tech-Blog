@@ -1,6 +1,7 @@
 const sequelize = require("../config/connection")
 const {User,Blog,Comment} = require("../models")
 
+//User seed
 const users = [
   {
     username: "emela",
@@ -16,6 +17,7 @@ const users = [
   }
 ]
 
+//Blog seed
 const blog = [
   {
     title: "new post",
@@ -39,6 +41,7 @@ const blog = [
   }
 ]
 
+//Comment seed
 const comments = [
   {
     body: "cool indeed",
