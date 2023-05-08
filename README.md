@@ -2,7 +2,11 @@
 
 ## Description
 
-This is an application were programmers can write about tech and share coding experience. Users can create a profile and post to a blog with a title and comment. Developers can comment on other blog posts to share knowledge and solutions to coding conflicts.  
+This is an application were programmers can write about tech and share coding experience. Users can create a profile and post to a blog with a title and comment. Developers can comment on other blog posts to share knowledge and solutions to coding conflicts. 
+
+## Deployed URL
+
+https://vast-hollows-79062.herokuapp.com/
 
 ## Table of Contents
 
@@ -35,5 +39,3 @@ No license
 ## Questions
 
 For questions about this project, please contact [teppley](https://github.com/teppley) at teppley300@gmail.com.
-
-erwqrtgfheasjgfek
