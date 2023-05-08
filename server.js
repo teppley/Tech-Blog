@@ -9,7 +9,7 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const { User, Blog, Comment } = require("./models");
+//const { User, Blog, Comment } = require("./models");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
