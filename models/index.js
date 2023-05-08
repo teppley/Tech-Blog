@@ -1,4 +1,4 @@
-const User = require("./User");
+import {User} from "./User"
 const Blog = require("./Blog");
 const Comment = require("./Comment");
 
